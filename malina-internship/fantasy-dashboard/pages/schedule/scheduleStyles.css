@@ -1,0 +1,179 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e2f;
+
+}
+
+.nav {
+    overflow: hidden;
+    background-color: #2b2b40;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.nav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.nav a:hover {
+    background-color: #2b2b40;
+    color: #e1cc1a;
+}
+
+.nav h2 {
+    color: white;
+    width: 50%;
+    margin-left:2%
+}
+.nav-routes {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+a.application-name{
+    font-size: 20px;
+    font-weight: bold;
+    padding: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+main {
+    margin-top:100px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.scheduleTitle{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e3a037;
+    text-decoration: underline;
+}
+
+.table{
+    background-color: #2b2b40;
+    width: 90%;
+    table-layout: fixed;
+    border: 1px solid #bcaa8f;
+    border-collapse: collapse;
+}
+
+.white{
+    color: white;
+}
+
+.tableHeader{
+    border: 1px solid #8f826d;
+}
+
+.tableCell{
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+    border: 1px solid #8f826d;
+}
+
+.color.green{
+    background-color: #93bd44;
+}
+
+.color.red{
+    background-color: #e14242;
+}
+
+.color.light-red{
+    background-color: #ec7a7a;
+}
+
+.color.purple{
+    background-color: rebeccapurple;
+}
+
+.color.light-purple{
+    background-color: mediumpurple;
+}
+
+.color.orange{
+    background-color: coral;
+}
+
+.tableCell:hover{
+    background-color: #a37676;
+}
+
+.listDiv{
+    width: 40%;
+    margin-top: 30px;
+}
+
+.membersList{
+    list-style-type: none;
+}
+
+.listElement{
+    color: white;
+    border-color: #e1cc1a;
+    box-shadow: 0 0 2px rgba(225, 204, 26, 0.4);
+    padding: 5px;
+    width: 100%;
+    background-color: #2b2b40;
+    margin: 10px;
+}
+
+.title{
+    font-weight: bold;
+    text-align: center;
+}
+
+.item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.text{
+    box-shadow: revert;
+    font-weight: bold;
+    padding: 0;
+}
+
+.name{
+    color: #e3a037;
+    font-size: 20px;
+}
+
+.description{
+    color: #fbf8f3;
+    font-size: 12px;
+}
+
+.lastActivity{
+    color: #5c5c58;
+    font-size: 10px;
+}
+
+.image{
+    width: 50px;
+    height: 50px;
+    border-radius: 70%;
+    border: 2px solid #e3a037;
+    margin-right: 12px;
+    object-fit: fill;
+    padding: 0;
+}
