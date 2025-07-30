@@ -1,0 +1,31 @@
+<script type="text/javascript" src="../../index.js"></script>
+
+<dialog class="modal" open id="addProductModal">
+    <div class="modal-header">
+        <h3 class="title"> Add New Product </h3>
+        <button type="button" class="close" onclick="closeModal()">&times;</button>
+    </div>
+    <hr class="hr">
+    <div class="modal-body">
+        <div class="modal-group">
+            <label class="label" for="product-name">Product Name</label>
+            <input class="input" type="text" id="product-name">
+        </div>
+        <div class="modal-group">
+            <label class="label" for="product-price">Price ($)</label>
+            <input class="input" type="number" id="product-price">
+        </div>
+        <div class="modal-group">
+            <label class="label" for="product-category">Category</label>
+            <input class="input" type="text" id="product-category">
+        </div>
+        <div class="modal-group">
+            <label class="label" for="product-stock">Stock</label>
+            <input class="input" type="number" id="product-stock">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="action-button cancel" onclick="closeModal()">Cancel</button>
+        <button class="action-button add" onclick="addProduct()">Add Product</button>
+    </div>
+</dialog>

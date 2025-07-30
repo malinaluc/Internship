@@ -1,0 +1,43 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="homeStyles.css">
+    <link rel="stylesheet" href="../addProductModal/addProductModal.css">
+    <script type="text/javascript" src="../../index.js"></script>
+</head>
+<body class = "body" onload="renderProducts(); countProducts(); renderCategories()">
+
+<main>
+    <h1 class="title"> &#128717;&#65039  Product Manager</h1>
+    <p class="description">Manage your products with ease</p>
+    <div class="products-management">
+        <button class="add-product" onclick="openModal()">+ Add Product</button>
+        <dialog id="addProductModal" class="modal"></dialog>
+
+        <div class="manipulate-products">
+            <input class ="search" type="search" placeholder="Search Products...">
+            <select class="select" name="categories" id="categories">
+                <option value="all">All Categories</option>
+            </select>
+            <select class="select" name="order" id="order" onChange="handleSortElements()">
+                <option value="nameasc">Name (A-Z)</option>
+                <option value="namedsc">Name (Z-A)</option>
+                <option value="priceasc">Price (Low-High)</option>
+                <option value="pricedsc">Price (High-Low)</option>
+                <option value="stockasc">Stock (Low-High)</option>
+                <option value="stockdsc">Stock (High-Low)</option>
+            </select>
+            <button class="clear-filters" onclick="handleClearFilters()">Clear Filters</button>
+        </div>
+
+        <div class="products-list">
+            <div class="list-info">
+                <p class="list-title">Products</p>
+                <p id="items-number" class="items-number"></p>
+            </div>
+            <div id="list-items" class="list-items"></div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
