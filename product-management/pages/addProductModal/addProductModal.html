@@ -2,10 +2,12 @@
 
 <dialog class="modal" open id="addProductModal">
     <div class="modal-header">
-        <h3 class="title"> Add New Product </h3>
-        <button type="button" class="close" onclick="closeModal()">&times;</button>
+        <h3 id="modal-title" class="title">Add New Product</h3>
+        <button type="button" class="close" onclick="closeAddModal()">&times;</button>
     </div>
+
     <hr class="hr">
+
     <div class="modal-body">
         <div class="modal-group">
             <label class="label" for="product-name">Product Name</label>
@@ -24,8 +26,9 @@
             <input class="input" type="number" id="product-stock">
         </div>
     </div>
+
     <div class="modal-footer">
-        <button class="action-button cancel" onclick="closeModal()">Cancel</button>
-        <button class="action-button add" onclick="addProduct()">Add Product</button>
+        <button class="action-button cancel" onclick="closeAddModal()">Cancel</button>
+        <button id="submit-button" class="action-button add" onclick="addProduct()">Add Product</button>
     </div>
 </dialog>

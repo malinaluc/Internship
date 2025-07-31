@@ -1,4 +1,10 @@
-const openModal = async () => {
+let editIndex = null;
+let deleteIndex = null;
+
+const getProducts = () => JSON.parse(localStorage.getItem('products')) || [];
+const getCategories = () => JSON.parse(localStorage.getItem('categories')) || [];
+
+const openAddModal = async () => {
     const modal = document.getElementById("addProductModal");
 
     if (modal) {
@@ -13,67 +19,134 @@ const openModal = async () => {
     modal.showModal();
 };
 
-const closeModal = () =>{
+const closeAddModal = () => {
     const modal = document.getElementById('addProductModal');
-    if(modal) {
+    if (modal) {
         modal.close();
     }
 };
 
-const addProduct = () =>{
-    let products = JSON.parse(localStorage.getItem('products')) || [];
-    if(!Array.isArray(products)) products = [];
+const openDeleteModal = async (productId) => {
+    const products = getProducts();
+    const index = products.findIndex(p => p.productId === productId);
+    if (index === -1) {
+        return;
+    }
+    deleteIndex = index;
 
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
-    if(!Array.isArray(categories)) categories = [];
+    const modal = document.getElementById("deleteProductModal");
 
+    if (modal) {
+        try {
+            const response = await fetch("../deleteProductModal/deleteProductModal.html");
+            modal.innerHTML = await response.text();
+        } catch (err) {
+            console.error('Fetch error:', err);
+            return;
+        }
+    }
+    modal.showModal();
+};
+
+const closeDeleteModal = () => {
+    const modal = document.getElementById('deleteProductModal');
+    if (modal) {
+        deleteIndex = null;
+        modal.close();
+    }
+};
+
+const addProduct = () => {
+    let products = getProducts()
+    if (!Array.isArray(products)) products = [];
+
+    let categories = getCategories()
+    if (!Array.isArray(categories)) categories = [];
+
+    const productId = products[editIndex] ? products[editIndex].productId : crypto.randomUUID();
     const productName = document.getElementById('product-name').value;
     const productPrice = document.getElementById('product-price').value;
     const productCategory = document.getElementById('product-category').value;
     const productStock = document.getElementById('product-stock').value;
 
-    if(!productName || !productPrice || !productCategory || !productStock) {
-        alert('Please complete all fields');
+    if (!productName || !productPrice || productPrice <= 0 || !productCategory || !productStock || productStock < 0) {
+        alert('Please fill all fields with valid values!');
+        return;
     }
 
-    const product = {productName, productPrice, productCategory, productStock};
-    products.push(product);
+    const product = {productId, productName, productPrice, productCategory, productStock};
+    if (editIndex !== null) {
+        const pCategory = products[editIndex].productCategory;
+        products[editIndex] = product;
+        editIndex = null;
+
+        const pCategoryExists = products.some(p => p.productCategory === pCategory);
+        if (!pCategoryExists) {
+            categories = categories.filter(c => c !== pCategory);
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+    } else {
+        if (products.find(p => p.productName === productName)) {
+            alert('Product name already exists!');
+            return;
+        }
+        products.push(product);
+    }
     localStorage.setItem('products', JSON.stringify(products));
 
-    if(!categories.includes(productCategory)) {
+    if (!categories.includes(productCategory)) {
         categories.push(productCategory);
         localStorage.setItem('categories', JSON.stringify(categories));
     }
 
-    closeModal();
-    //countProducts();
+    closeAddModal();
+    countProducts();
     renderProducts();
+    renderCategories();
 };
 
 const renderCategories = () => {
     const categoriesSelector = document.getElementById('categories');
-    let categories = localStorage.getItem('categories');
+    let categories = getCategories();
+
+    categoriesSelector.innerHTML = '';
+
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = 'All Categories';
+    categoriesSelector.appendChild(allOption);
+
     categories.forEach(category => {
-        const div = document.createElement('div');
-        div.className = 'select';
-        div.innerHTML = `
-            <option value="${category}">${category}</option>
-        `;
-        categoriesSelector.appendChild(div);
-    })
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoriesSelector.appendChild(option);
+    });
 };
 
-const renderProducts = () => {
-    let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-    const productsList = document.getElementById('list-items');
+const renderProducts = (products = null) => {
+    if (!products) {
+        products = getProducts();
+    }
 
+    const productsList = document.getElementById('list-items');
     productsList.innerHTML = '';
 
-    products.forEach((product, index) => {
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.innerHTML =
+    if (products.length === 0) {
+        productsList.className = 'list-items-empty';
+        productsList.innerHTML =
             `
+                <div class="list-text">
+                    No products available.
+                </div>
+            `;
+    } else {
+        productsList.className = 'list-items';
+        products.forEach((product) => {
+            const div = document.createElement('div');
+            div.className = 'product';
+            div.innerHTML =
+                `
                     <p class="product-name-p">${product.productName}</p>
                     <div>
                         <div class="product-price-p">
@@ -89,59 +162,76 @@ const renderProducts = () => {
                         </div>
                         <div class="product-stock-p">
                             <p class="label">Stock:</p>
-                            <p class="value">${product.productStock}</p>
+                            <p class="value">
+                              ${product.productStock} ${addStockLabel(product.productStock)}
+                            </p>
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button class="action-button green" onclick=updateProduct(${index})>Edit</button>
-                        <button class="action-button red" onclick=deleteProduct(${index})>Delete</button>
+                        <button class="action-button green" onclick=updateProduct('${product.productId}')>Edit</button>
+                        <button class="action-button red" onclick=openDeleteModal('${product.productId}')>Delete</button>
                     </div>   
-            `
-        productsList.appendChild(div);
-    })
-};
-
-const countProducts = () => {
-    let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-    let count = products.length;
-
-    const numberOfItems = document.getElementById('items-number');
-
-    const div = document.createElement('div');
-    div.innerHTML = ``;
-    div.className = 'items-number';
-    div.innerHTML = `<p>(${count})</p>`;
-
-    numberOfItems.appendChild(div);
-};
-
-const deleteProduct = (index) => {
-    let text = "Are you sure you want to delete this product?";
-    if (confirm(text) === true) {
-        let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-        products.splice(index, 1);
-        localStorage.setItem('products', JSON.stringify(products));
-        //countProducts();
-        renderProducts();
-    } else {
-        alert("Be more careful next time! :)")
+            `;
+            productsList.appendChild(div);
+        })
     }
 };
 
-const updateProduct = async (index) => {
-    const products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-    const product = products[index];
+const addStockLabel = (stock) => {
+    if (stock === 0) {
+        return `<span>(Out of Stock)</span>`;
+    } else if (stock < 5) {
+        return `<span>(Low Stock)</span>`;
+    } else if (stock > 50) {
+        return `<span>(High Stock)</span>`;
+    } else {
+        return ``;
+    }
+};
 
-    const productName = product.productName
-    const productPrice = product.productPrice;
-    const productCategory = product.productCategory;
-    const productStock = product.productStock;
+const countProducts = (products = null) => {
+    if (!products) {
+        products = getProducts();
+    }
+    let count = products.length;
+    const numberOfItems = document.getElementById('items-number');
+    numberOfItems.innerHTML = `<p>(${count})</p>`;
+};
+
+const updateProduct = async (productId) => {
+    const products = getProducts();
+    const index = products.findIndex(p => p.productId === productId);
+
+    if (index === -1) {
+        return;
+    }
+    editIndex = index;
 
     const modal = document.getElementById("addProductModal");
     if (modal) {
         try {
             const response = await fetch("../addProductModal/addProductModal.html");
+            modal.innerHTML = await response.text();
 
+            const products = getProducts();
+            const product = products[editIndex];
+
+            document.getElementById('product-name').value = product.productName;
+            document.getElementById('product-price').value = product.productPrice;
+            document.getElementById('product-category').value = product.productCategory;
+            document.getElementById('product-stock').value = product.productStock;
+
+            const title = document.getElementById('modal-title');
+            if (title) {
+                title.textContent = `Edit Product`;
+            }
+
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+                submitButton.textContent = 'Save';
+            }
+
+            modal.showModal();
         } catch (err) {
             console.error('Fetch error:', err);
             return;
@@ -149,69 +239,74 @@ const updateProduct = async (index) => {
     }
 };
 
-const handleSortElements = () => {
-    const orderSelectorValue = document.getElementById('order').value;
+const deleteProduct = () => {
     let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
+    const deleteProduct = products[deleteIndex];
+    const deletedCategory = deleteProduct.productCategory;
 
-    switch(orderSelectorValue) {
-        case 'nameasc':
-            sortAscendingByName(products);
-            break;
-        case 'namedsc':
-            sortDescendingByName(products);
-            break;
-        case 'priceasc':
-            sortAscendingByPrice(products);
-            break;
-        case 'pricedsc':
-            sortDescendingByPrice(products);
-            break;
-        case 'stockasc':
-            sortAscendingByStock(products);
-            break;
-        case 'stockdsc':
-            sortDescendingByStock(products);
-            break;
+    products.splice(deleteIndex, 1);
+    localStorage.setItem('products', JSON.stringify(products));
+
+    const checkCategory = products.some(p => p.productCategory === deletedCategory);
+    if (!checkCategory) {
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+        categories = categories.filter(category => category !== deletedCategory);
+        localStorage.setItem('categories', JSON.stringify(categories));
     }
-};
 
-const sortAscendingByName = (products) => {
-    products.sort((a,b) => a.productName.localeCompare(b.productName));
-    localStorage.setItem('products', JSON.stringify(products));
+    closeDeleteModal();
+    countProducts();
     renderProducts();
-};
-
-const sortDescendingByName = (products) => {
-    products.sort((a,b) => b.productName.localeCompare(a.productName));
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
-};
-
-const sortAscendingByPrice = (products) => {
-    products.sort((a,b) => a.productPrice - b.productPrice);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
-};
-
-const sortDescendingByPrice = (products) => {
-    products.sort((a,b) => b.productPrice - a.productPrice);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
-};
-
-const sortAscendingByStock = (products) => {
-    products.sort((a,b) => a.productStock - b.productStock);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
-};
-
-const sortDescendingByStock = (products) => {
-    products.sort((a,b) => b.productStock - a.productStock);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
+    renderCategories();
 };
 
 const handleClearFilters = () => {
-    let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-    sortAscendingByName(products);
+    document.getElementById('categories').value = 'all';
+    document.getElementById('order').value = 'nameasc';
+    document.getElementById('search').value = '';
+
+    const products = getProducts();
+    products.sort((a, b) => a.productName.localeCompare(b.productName));
+
+    renderProducts(products);
+    countProducts(products);
+};
+
+const refreshPage = () => {
+    let products = getProducts();
+
+    const selectedCategory = document.getElementById('categories').value;
+    if (selectedCategory !== 'all') {
+        products = products.filter(p => p.productCategory === selectedCategory);
+    }
+
+    const searchValue = document.getElementById('search').value.toLowerCase();
+    if (searchValue) {
+        products = products.filter(p => p.productName.toLowerCase().includes(searchValue));
+    }
+
+    const orderSelectorValue = document.getElementById('order').value;
+    switch (orderSelectorValue) {
+        case 'nameasc':
+            products.sort((a, b) => a.productName.localeCompare(b.productName));
+            break;
+        case 'namedsc':
+            products.sort((a, b) => b.productName.localeCompare(a.productName));
+            break;
+        case 'priceasc':
+            products.sort((a, b) => a.productPrice - b.productPrice);
+            break;
+        case 'pricedsc':
+            products.sort((a, b) => b.productPrice - a.productPrice);
+            break;
+        case 'stockasc':
+            products.sort((a, b) => a.productStock - b.productStock);
+            break;
+        case 'stockdsc':
+            products.sort((a, b) => b.productStock - a.productStock);
+            break;
+    }
+
+    renderProducts(products);
+    countProducts(products);
 };
