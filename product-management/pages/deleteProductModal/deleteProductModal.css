@@ -11,7 +11,7 @@
     display: initial;
 }
 
-.modal-header {
+.delete-modal-header {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -21,13 +21,13 @@
     box-sizing: border-box;
 }
 
-.title {
+.delete-modal-title {
     margin: 0;
 }
 
 .close {
     color: #94A3B8;
-    font-size: 28px;
+    font-size: 20px;
     border: none;
     background: none;
 }
@@ -40,7 +40,7 @@
     transform: scale(1.05);
 }
 
-.modal-body {
+.delete-modal-body {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -49,7 +49,7 @@
     box-sizing: border-box;
 }
 
-.modal-footer {
+.delete-modal-footer {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -59,13 +59,13 @@
     box-sizing: border-box;
 }
 
-.action-button {
+.delete-action-button {
     border-radius: 10px;
     padding: 10px;
     border: 1px solid #E0E7EF;
 }
 
-.action-button:hover {
+.delete-action-button:hover {
     cursor: pointer;
     transform: scale(1.05);
 }

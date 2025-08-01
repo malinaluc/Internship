@@ -1,28 +1,26 @@
 let editIndex = null;
 let deleteIndex = null;
+let bulkDeleteIndexes = [];
 
 const getProducts = () => JSON.parse(localStorage.getItem('products')) || [];
 const getCategories = () => JSON.parse(localStorage.getItem('categories')) || [];
 
 const openAddModal = async () => {
-    const modal = document.getElementById("addProductModal");
+    const template = document.getElementById("add-product-template");
+    const clone = template.content.cloneNode(true);
+    document.body.appendChild(clone);
 
+    const modal = document.getElementById("addProductModal");
     if (modal) {
-        try {
-            const response = await fetch("../addProductModal/addProductModal.html");
-            modal.innerHTML = await response.text();
-        } catch (err) {
-            console.error('Fetch error:', err);
-            return;
-        }
+        modal.showModal();
     }
-    modal.showModal();
 };
 
 const closeAddModal = () => {
     const modal = document.getElementById('addProductModal');
     if (modal) {
         modal.close();
+        modal.remove();
     }
 };
 
@@ -34,18 +32,14 @@ const openDeleteModal = async (productId) => {
     }
     deleteIndex = index;
 
-    const modal = document.getElementById("deleteProductModal");
+    const template = document.getElementById("delete-product-template");
+    const clone = template.content.cloneNode(true);
+    document.body.appendChild(clone);
 
+    const modal = document.getElementById("deleteProductModal");
     if (modal) {
-        try {
-            const response = await fetch("../deleteProductModal/deleteProductModal.html");
-            modal.innerHTML = await response.text();
-        } catch (err) {
-            console.error('Fetch error:', err);
-            return;
-        }
+        modal.showModal();
     }
-    modal.showModal();
 };
 
 const closeDeleteModal = () => {
@@ -53,7 +47,42 @@ const closeDeleteModal = () => {
     if (modal) {
         deleteIndex = null;
         modal.close();
+        modal.remove();
     }
+};
+
+const openBulkDeleteModal = async () => {
+    const checkboxes = document.getElementsByClassName('bulk-delete');
+    const checked = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+    bulkDeleteIndexes = checked.map(checkbox => checkbox.getAttribute('data-id'));
+
+    if (bulkDeleteIndexes.length < 2) {
+        alert("Please select at least 2 products to delete.");
+        return;
+    }
+
+    const template = document.getElementById("delete-product-template");
+    const clone = template.content.cloneNode(true);
+    document.body.appendChild(clone);
+
+    const modal = document.getElementById("deleteProductModal");
+
+    const title = document.getElementById('delete-modal-title');
+    if (title) {
+        title.textContent = "Delete Products";
+    }
+
+    const description = document.getElementById('delete-modal-body');
+    if (description) {
+        description.textContent = "Are you sure you want to delete the selected products?";
+    }
+
+    const deleteButton = document.getElementById('delete-button');
+    if (deleteButton) {
+        deleteButton.textContent = "Delete Products";
+    }
+    modal.showModal();
+
 };
 
 const addProduct = () => {
@@ -146,30 +175,33 @@ const renderProducts = (products = null) => {
             const div = document.createElement('div');
             div.className = 'product';
             div.innerHTML =
-                `
-                    <p class="product-name-p">${product.productName}</p>
-                    <div>
-                        <div class="product-price-p">
+                `       
+                    <div class="product-header">
+                        <p class="product-name-p">${product.productName}</p>
+                        <input class="bulk-delete" type="checkbox" id="bulk-delete" name="Bulk Delete" data-id="${product.productId}"/>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-properties">
                             <p class="label">Price:</p>
                             <div class="price-group">
                                 <p class="value">$</p>
                                 <p class="value">${product.productPrice}</p>
                             </div>
                         </div>
-                        <div class="product-category-p">
+                        <div class="product-properties category">
                             <p class="label">Category:</p>
                             <p class="category-value">${product.productCategory}</p>
                         </div>
-                        <div class="product-stock-p">
+                        <div class="product-properties">
                             <p class="label">Stock:</p>
                             <p class="value">
                               ${product.productStock} ${addStockLabel(product.productStock)}
                             </p>
                         </div>
                     </div>
-                    <div class="action-buttons">
-                        <button class="action-button green" onclick=updateProduct('${product.productId}')>Edit</button>
-                        <button class="action-button red" onclick=openDeleteModal('${product.productId}')>Delete</button>
+                    <div class="product-footer">
+                        <button class="product-action-button green" onclick=updateProduct('${product.productId}')>Edit</button>
+                        <button class="product-action-button red" onclick=openDeleteModal('${product.productId}')>Delete</button>
                     </div>   
             `;
             productsList.appendChild(div);
@@ -178,7 +210,7 @@ const renderProducts = (products = null) => {
 };
 
 const addStockLabel = (stock) => {
-    if (stock === 0) {
+    if (stock == 0) {
         return `<span>(Out of Stock)</span>`;
     } else if (stock < 5) {
         return `<span>(Low Stock)</span>`;
@@ -207,57 +239,62 @@ const updateProduct = async (productId) => {
     }
     editIndex = index;
 
-    const modal = document.getElementById("addProductModal");
-    if (modal) {
-        try {
-            const response = await fetch("../addProductModal/addProductModal.html");
-            modal.innerHTML = await response.text();
-
-            const products = getProducts();
-            const product = products[editIndex];
-
-            document.getElementById('product-name').value = product.productName;
-            document.getElementById('product-price').value = product.productPrice;
-            document.getElementById('product-category').value = product.productCategory;
-            document.getElementById('product-stock').value = product.productStock;
-
-            const title = document.getElementById('modal-title');
-            if (title) {
-                title.textContent = `Edit Product`;
-            }
-
-            const submitButton = document.getElementById('submit-button');
-            if (submitButton) {
-                submitButton.textContent = 'Save';
-            }
-
-            modal.showModal();
-        } catch (err) {
-            console.error('Fetch error:', err);
-            return;
-        }
+    let existing = document.getElementById("addProductModal");
+    if (existing) {
+        existing.remove();
     }
+
+    const template = document.getElementById("add-product-template");
+
+    const clone = template.content.cloneNode(true);
+    document.body.appendChild(clone);
+
+    const modal = document.getElementById("addProductModal");
+    if (!modal) return;
+
+    const product = products[editIndex];
+
+    document.getElementById('product-name').value = product.productName;
+    document.getElementById('product-price').value = product.productPrice;
+    document.getElementById('product-category').value = product.productCategory;
+    document.getElementById('product-stock').value = product.productStock;
+
+    const title = document.getElementById('modal-title');
+    if (title) {
+        title.textContent = `Edit Product`;
+    }
+
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.textContent = 'Edit Product';
+    }
+
+    modal.showModal();
 };
 
 const deleteProduct = () => {
-    let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
-    const deleteProduct = products[deleteIndex];
-    const deletedCategory = deleteProduct.productCategory;
+    if (bulkDeleteIndexes && bulkDeleteIndexes.length > 0) {
+        handleBulkDelete();
+    } else {
+        let products = localStorage.getItem('products') ? JSON.parse(localStorage.getItem('products')) : [];
+        const deleteProduct = products[deleteIndex];
+        const deletedCategory = deleteProduct.productCategory;
 
-    products.splice(deleteIndex, 1);
-    localStorage.setItem('products', JSON.stringify(products));
+        products.splice(deleteIndex, 1);
+        localStorage.setItem('products', JSON.stringify(products));
 
-    const checkCategory = products.some(p => p.productCategory === deletedCategory);
-    if (!checkCategory) {
-        let categories = JSON.parse(localStorage.getItem('categories')) || [];
-        categories = categories.filter(category => category !== deletedCategory);
-        localStorage.setItem('categories', JSON.stringify(categories));
+        const checkCategory = products.some(p => p.productCategory === deletedCategory);
+        if (!checkCategory) {
+            let categories = JSON.parse(localStorage.getItem('categories')) || [];
+            categories = categories.filter(category => category !== deletedCategory);
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        closeDeleteModal();
+        countProducts();
+        renderProducts();
+        renderCategories();
     }
-
-    closeDeleteModal();
-    countProducts();
-    renderProducts();
-    renderCategories();
 };
 
 const handleClearFilters = () => {
@@ -309,4 +346,28 @@ const refreshPage = () => {
 
     renderProducts(products);
     countProducts(products);
+};
+
+const handleBulkDelete = () => {
+    let products = getProducts();
+    const remainingProducts = products.filter(p => !bulkDeleteIndexes.includes(p.productId));
+    const deletedProducts = products.filter(p => bulkDeleteIndexes.includes(p.productId));
+    const deletedProductsCategory = deletedProducts.map(p => p.productCategory);
+
+    localStorage.setItem('products', JSON.stringify(remainingProducts));
+    bulkDeleteIndexes = [];
+
+    let categories = getCategories();
+    deletedProductsCategory.forEach(category => {
+        const stillExists = remainingProducts.some(p => p.productCategory === category);
+        if (!stillExists) {
+            categories = categories.filter(c => c !== category);
+        }
+    });
+    localStorage.setItem('categories', JSON.stringify(categories));
+
+    closeDeleteModal();
+    countProducts();
+    renderProducts();
+    renderCategories();
 };

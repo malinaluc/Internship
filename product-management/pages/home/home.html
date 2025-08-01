@@ -17,9 +17,6 @@
     <div class="products-management">
         <button class="add-product" onclick="openAddModal()">+ Add Product</button>
 
-        <dialog id="addProductModal" class="modal"></dialog>
-        <dialog id="deleteProductModal" class="modal"></dialog>
-
         <div class="manipulate-products">
             <input id="search" class="search" type="search" placeholder="Search Products..." onkeyup="refreshPage()">
             <div class="filter-buttons">
@@ -39,13 +36,70 @@
         </div>
 
         <div class="products-list">
-            <div class="list-info">
-                <p class="list-title">Products</p>
-                <p id="items-number" class="items-number"></p>
+            <div class="list-header">
+                <div class="list-info">
+                    <p class="list-title">Products</p>
+                    <p id="items-number" class="items-number"></p>
+                </div>
+                <button class="bulk-delete-button" onclick="openBulkDeleteModal()">Bulk Delete</button>
             </div>
             <div id="list-items" class="list-items"></div>
         </div>
     </div>
+
+    <template id="add-product-template">
+        <dialog class="modal" id="addProductModal">
+            <div class="add-modal-header">
+                <h3 id="modal-title" class="add-modal-title">Add New Product</h3>
+                <button type="button" class="close" onclick="closeAddModal()">&times;</button>
+            </div>
+
+            <hr class="hr">
+
+            <div class="add-modal-body">
+                <div class="add-modal-group">
+                    <label class="add-modal-label" for="product-name">Product Name</label>
+                    <input class="add-modal-input" type="text" id="product-name">
+                </div>
+                <div class="add-modal-group">
+                    <label class="add-modal-label" for="product-price">Price ($)</label>
+                    <input class="add-modal-input" type="number" id="product-price">
+                </div>
+                <div class="add-modal-group">
+                    <label class="add-modal-label" for="product-category">Category</label>
+                    <input class="add-modal-input" type="text" id="product-category">
+                </div>
+                <div class="add-modal-group">
+                    <label class="add-modal-label" for="product-stock">Stock</label>
+                    <input class="add-modal-input" type="number" id="product-stock">
+                </div>
+            </div>
+
+            <div class="add-modal-footer">
+                <button class="add-action-button cancel" onclick="closeAddModal()">Cancel</button>
+                <button id="submit-button" class="add-action-button add" onclick="addProduct()">Add Product</button>
+            </div>
+        </dialog>
+    </template>
+
+    <template id="delete-product-template">
+        <dialog class="modal" id="deleteProductModal">
+            <div class="delete-modal-header">
+                <h3 id="delete-modal-title" class="title">Delete product </h3>
+                <button type="button" class="close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+
+            <div id="delete-modal-body" class="delete-modal-body">
+                <p>Are you sure you want to delete this product?</p>
+            </div>
+
+            <div class="delete-modal-footer">
+                <button class="delete-action-button cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button id="delete-button" class="delete-action-button delete" onclick="deleteProduct()">Delete
+                </button>
+            </div>
+        </dialog>
+    </template>
 </main>
 </body>
 </html>

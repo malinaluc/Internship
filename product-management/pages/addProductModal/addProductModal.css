@@ -9,25 +9,25 @@
     box-sizing: border-box;
     padding: 0;
     display: initial;
+    overflow: hidden;
 }
 
-.modal-header {
+.add-modal-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 20px 0 20px;
     box-sizing: border-box;
+    padding: 20px 20px 0 20px;
 }
 
-.title {
+.add-modal-title {
     margin: 0;
 }
 
 .close {
     color: #94A3B8;
-    font-size: 28px;
     border: none;
     background: none;
 }
@@ -42,45 +42,44 @@
 
 .hr {
     height: 1px;
-    background-color: #94A3B8;
+    background-color: #c6c1c1;
     width: 100%;
     border: none;
-    padding: 0;
 }
 
-.modal-body {
+.add-modal-body {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 0 20px 20px 20px;
+    padding: 10px 20px 20px 20px;
     box-sizing: border-box;
 }
 
-.modal-group {
+.add-modal-group {
     display: flex;
     flex-direction: column;
     width: 100%;
     gap: 10px;
 }
 
-.label {
+.add-modal-label {
     color: #232629;
 }
 
-.input {
+.add-modal-input {
     width: 100%;
     border: 1px solid #E0E7EF;
     border-radius: 10px;
     padding: 10px;
 }
 
-.input:active {
+.add-modal-input:active {
     box-shadow: 2px 2px 4px #474a51;
 }
 
-.modal-footer {
-    width: 50%;
+.add-modal-footer {
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -89,14 +88,17 @@
     box-sizing: border-box;
 }
 
-.action-button {
+.add-action-button {
     width: 100px;
+    height: 40px;
     border-radius: 10px;
     padding: 10px;
     border: 1px solid #E0E7EF;
+    font-size: x-small;
+    cursor: pointer;
 }
 
-.action-button:hover {
+.add-action-button:hover {
     cursor: pointer;
     transform: scale(1.05);
 }
