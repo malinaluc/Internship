@@ -1,0 +1,1 @@
+{"version":3,"file":"mock-products.js","sourceRoot":"","sources":["../../src/data/mock-products.ts"],"names":[],"mappings":";;;AAEa,QAAA,YAAY,GAAc;IACnC;QACI,IAAI,EAAE,GAAG;QACT,MAAM,EAAE,QAAQ;QAChB,OAAO,EAAE,IAAI;QACb,OAAO,EAAE,EAAE;KACd;IACD;QACI,IAAI,EAAE,GAAG;QACT,MAAM,EAAE,OAAO;QACf,OAAO,EAAE,GAAG;QACZ,OAAO,EAAE,EAAE;KACd;CACJ,CAAA"}

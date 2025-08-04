@@ -1,0 +1,16 @@
+import {Product} from "../types/product.types";
+
+export const mockProducts: Product[] = [
+    {
+        "id": "1",
+        "name": "Laptop",
+        "price": 3000,
+        "stock": 10
+    },
+    {
+        "id": "2",
+        "name": "Mouse",
+        "price": 100,
+        "stock": 50
+    }
+]
