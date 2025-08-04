@@ -4,7 +4,7 @@ export declare class ProductService {
     getAll(): Product[];
     getById(id: string): Product | undefined;
     create(productData: Product): Product;
-    update(): void;
+    update(id: string, data: Partial<Omit<Product, "id">>): Product | null;
     delete(id: string): boolean;
 }
 //# sourceMappingURL=product.service.d.ts.map

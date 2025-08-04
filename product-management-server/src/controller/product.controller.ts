@@ -32,7 +32,17 @@ export class ProductController {
 
     public update(req: Request, res: Response): void {
         const id = req.params.id;
+        const {name, price, stock} = req.body;
 
+        if (!name && !price && !stock) {
+            res.status(400).json({"Properties not ok for product with id: ": id});
+        }
+
+        const updated = productService.update(id!, { name, price, stock });
+
+        updated
+            ? res.json(updated)
+            : res.status(404).json({"Product not found, id: ": id });
     }
 
     public delete(req: Request, res: Response): void {

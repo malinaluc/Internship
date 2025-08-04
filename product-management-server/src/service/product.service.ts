@@ -24,8 +24,21 @@ export class ProductService {
         return newProduct;
     }
 
-    public update(): void {
+    public update(id: string, data: Partial<Omit<Product, "id">>): Product | null {
+        const index = this.products.findIndex(p => p.id === id);
+        if (index === -1) return null;
 
+        const existing = this.products[index]!;
+
+        const updatedProduct: Product = {
+            id: existing.id!,
+            name: data.name ?? existing.name,
+            price: data.price ?? existing.price,
+            stock: data.stock ?? existing.stock
+        };
+
+        this.products[index] = updatedProduct;
+        return updatedProduct;
     }
 
     public delete(id: string): boolean {

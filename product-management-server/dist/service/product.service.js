@@ -23,7 +23,20 @@ class ProductService {
         this.products.push(newProduct);
         return newProduct;
     }
-    update() {
+    update(id, data) {
+        var _a, _b, _c;
+        const index = this.products.findIndex(p => p.id === id);
+        if (index === -1)
+            return null;
+        const existing = this.products[index];
+        const updatedProduct = {
+            id: existing.id,
+            name: (_a = data.name) !== null && _a !== void 0 ? _a : existing.name,
+            price: (_b = data.price) !== null && _b !== void 0 ? _b : existing.price,
+            stock: (_c = data.stock) !== null && _c !== void 0 ? _c : existing.stock
+        };
+        this.products[index] = updatedProduct;
+        return updatedProduct;
     }
     delete(id) {
         const index = this.products.findIndex(p => p.id === id);
